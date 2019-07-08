@@ -8,8 +8,7 @@ module.exports = function(app) {
     // On a new real-time connection, add it to the anonymous channel
     app.channel('cards').join(connection);
     const cards = await app.service('cards').find();
-    console.log("Hello `${cards}`");
-    app.channel('cards').send(cards);
+    app.io.sockets.emit('cards', {data:cards});
   });
 
   app.on('login', (authResult, { connection }) => {
@@ -53,12 +52,10 @@ module.exports = function(app) {
   // Here you can also add service specific event publishers
   // e.g. the publish the `users` service `created` event to the `admins` channel
   app.service('cards').publish('created', (data, context) =>
-    {
-      console.log("Bhumika");
-      console.log(data);
+  {
     app.channel('cards')
-    }
-  );
+    app.io.sockets.emit('created', {data: data})
+  });
 
 
   
