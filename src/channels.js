@@ -7,7 +7,15 @@ module.exports = function(app) {
   app.on('connection', async connection => {
     // On a new real-time connection, add it to the anonymous channel
     app.channel('cards').join(connection);
-    const cards = await app.service('cards').find();
+    const cards = await app.service('cards').find({
+        query: {
+          $limit: 200,
+          $sort: {
+            createdAt: -1
+          }
+        }
+      }
+    );
     app.io.sockets.emit('cards', {data:cards});
   });
 
